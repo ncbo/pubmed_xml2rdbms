@@ -18,18 +18,10 @@ public class MedlineCitationETL {
 
     private static final Logger logger = LoggerFactory.getLogger(MedlineCitationETL.class);
 
-    private Properties defaultProps = new Properties();
+    private MedlineCitationETLProperties defaultProps;
 
     public MedlineCitationETL() {
-        InputStream in = this.getClass().getClassLoader().getResourceAsStream("config.properties");
-
-        try {
-            defaultProps.load(in);
-            in.close();
-        } catch (IOException e) {
-            logger.error("Failed to load properties file: {}", e.getMessage());
-            e.printStackTrace();
-        }
+        defaultProps = MedlineCitationETLProperties.getInstance();
     }
 
     private boolean loadMedlineFiles() {
