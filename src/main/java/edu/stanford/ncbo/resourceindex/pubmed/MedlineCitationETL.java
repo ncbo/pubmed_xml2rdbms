@@ -61,6 +61,8 @@ public class MedlineCitationETL {
                 try {
                     parser = factory.newSAXParser();
                     parser.parse(inputStream, handler);
+                    inputStream.close();
+                    logger.info("Finished loading Medline file: {}\n", f.getName());
                 } catch (IOException | ParserConfigurationException | SAXException e) {
                     logger.error(e.getMessage());
                     e.printStackTrace();
