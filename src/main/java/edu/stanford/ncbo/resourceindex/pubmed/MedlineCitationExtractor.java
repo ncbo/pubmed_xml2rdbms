@@ -21,16 +21,21 @@ public class MedlineCitationExtractor {
 
     private static final Logger logger = LoggerFactory.getLogger(MedlineCitationExtractor.class);
 
+    private boolean validateFile;
+
     private File file;
 
-    public MedlineCitationExtractor(File file) {
+    public MedlineCitationExtractor(File file, boolean validateFile) {
         this.file = file;
+        this.validateFile = validateFile;
     }
 
     public InputStream extract() {
         InputStream inputStream = null;
 
-        if (!isValidDataFile()) return null;
+        if (validateFile) {
+            if (!isValidDataFile()) return null;
+        }
 
         try {
             ZipFile zipFile = new ZipFile(file);

@@ -32,18 +32,22 @@ public class MedlineCitationETL {
             logger.error("Invalid data directory: {}", path);
             return false;
         }
-        logger.info("Medline data directory: {}", file.getAbsolutePath());
+        logger.info("Medline data directory: {}\n", file.getAbsolutePath());
 
         MedlineCitationHandler handler = new MedlineCitationHandler();
         MedlineCitationTranslator translator = new MedlineCitationTranslator();
+
+        // TODO: If any SQLExceptions are thrown by instantiating a translator, don't continue.
+
         handler.addNewMedlineCitationListener(translator);
 
         // Load all Medline XML files in data directory.
+        Boolean performValidation = Boolean.parseBoolean(defaultProps.getProperty("performValidation"));
         Collection<File> files = FileUtils.listFiles(file, new String[]{"xml.zip"}, false);
         for (File f : files) {
             logger.info("Load Medline file: {}", f.getName());
 
-            MedlineCitationExtractor mce = new MedlineCitationExtractor(f);
+            MedlineCitationExtractor mce = new MedlineCitationExtractor(f, performValidation.booleanValue());
             InputStream inputStream = mce.extract();
 
             if (inputStream != null) {
