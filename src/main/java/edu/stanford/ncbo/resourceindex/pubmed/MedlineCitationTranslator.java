@@ -36,7 +36,6 @@ public class MedlineCitationTranslator implements NewMedlineCitationEventListene
         try {
             connection = DriverManager.getConnection(url, user, password);
         } catch (SQLException e) {
-            logger.error("Can't connect to database: {}", url);
             logSQLException(e);
         }
     }
@@ -44,7 +43,9 @@ public class MedlineCitationTranslator implements NewMedlineCitationEventListene
     private void initializeTable(){
         String dbName = props.getProperty("jdbc.dbName");
         String tableName = props.getProperty("jdbc.tableName");
-        String sql =
+        Boolean reinitialize = Boolean.parseBoolean(props.getProperty("reinitializeTable"));
+
+        String createString =
                 String.format("CREATE TABLE %s.%s (id integer(10) UNSIGNED NOT NULL AUTO_INCREMENT, " +
                         "local_element_id varchar(255) NOT NULL, pm_title text, pm_abstract text, " +
                         "pm_keywords text, pm_meshheadings text, PRIMARY KEY (id), " +
@@ -52,9 +53,11 @@ public class MedlineCitationTranslator implements NewMedlineCitationEventListene
 
         try {
             Statement statement = connection.createStatement();
-            statement.executeUpdate(sql);
+            if (reinitialize) {
+                statement.executeUpdate(String.format("DROP TABLE IF EXISTS %s.%s", dbName, tableName));
+            }
+            statement.executeUpdate(createString);
         } catch (SQLException e) {
-            logger.error("Failed to create table: {}", tableName);
             logSQLException(e);
         }
     }
