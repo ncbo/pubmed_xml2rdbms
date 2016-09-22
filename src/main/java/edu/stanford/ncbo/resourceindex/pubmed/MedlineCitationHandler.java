@@ -46,6 +46,7 @@ public class MedlineCitationHandler extends DefaultHandler {
                 break;
             case "DescriptorName":
                 citation.getMeshHeadings().add(characterValue);
+                break;
             case "MedlineCitation":
                 fireNewMedlineCitationEvent();
                 break;
