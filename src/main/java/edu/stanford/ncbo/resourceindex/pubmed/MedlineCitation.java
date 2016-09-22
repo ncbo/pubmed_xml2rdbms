@@ -5,11 +5,11 @@ import java.util.List;
 
 public class MedlineCitation {
 
-    private int pubMedId;
+    private String pubMedId = "";
 
-    private String articleTitle;
+    private String articleTitle = "";
 
-    private String abstractText;
+    private String abstractText = "";
 
     private List<String> keywords;
 
@@ -20,11 +20,11 @@ public class MedlineCitation {
         meshHeadings = new ArrayList<String>();
     }
 
-    public int getPubMedId() {
+    public String getPubMedId() {
         return pubMedId;
     }
 
-    public void setPubMedId(int pubMedId) {
+    public void setPubMedId(String pubMedId) {
         this.pubMedId = pubMedId;
     }
 
@@ -62,6 +62,6 @@ public class MedlineCitation {
 
     @Override
     public String toString() {
-        return String.format("MedlineCitation{ PubMed ID: %d, Article Title: %s }", this.pubMedId, this.articleTitle);
+        return String.format("MedlineCitation{ PubMed ID: %s, Article Title: %s }", this.pubMedId, this.articleTitle);
     }
 }
