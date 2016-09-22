@@ -33,7 +33,7 @@ public class MedlineCitationHandler extends DefaultHandler {
 
         switch (qName) {
             case "PMID":
-                citation.setPubMedId(Integer.parseInt(characterValue));
+                citation.setPubMedId(characterValue);
                 break;
             case "ArticleTitle":
                 citation.setArticleTitle(characterValue);
@@ -44,6 +44,8 @@ public class MedlineCitationHandler extends DefaultHandler {
             case "Keyword":
                 citation.getKeywords().add(characterValue);
                 break;
+            case "DescriptorName":
+                citation.getMeshHeadings().add(characterValue);
             case "MedlineCitation":
                 fireNewMedlineCitationEvent();
                 break;
