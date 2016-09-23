@@ -1,6 +1,7 @@
 package edu.stanford.ncbo.resourceindex.pubmed;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -11,6 +12,8 @@ import javax.xml.parsers.SAXParserFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Collection;
 
 public class MedlineCitationETL {
@@ -45,19 +48,28 @@ public class MedlineCitationETL {
         Boolean performValidation = Boolean.parseBoolean(defaultProps.getProperty("performValidation"));
         Collection<File> files = FileUtils.listFiles(file, new String[]{"xml.zip"}, false);
         for (File f : files) {
-            logger.info("Load Medline file: {}", f.getName());
+            String fileName = f.getName();
+            logger.info("Load Medline file: {}", fileName);
+
+            Instant start = Instant.now();
 
             MedlineCitationExtractor mce = new MedlineCitationExtractor(f, performValidation.booleanValue());
             InputStream inputStream = mce.extract();
 
             if (inputStream != null) {
                 SAXParserFactory factory = SAXParserFactory.newInstance();
-                SAXParser parser = null;
                 try {
-                    parser = factory.newSAXParser();
+                    SAXParser parser = factory.newSAXParser();
                     parser.parse(inputStream, handler);
                     inputStream.close();
-                    logger.info("Finished loading Medline file: {}\n", f.getName());
+
+                    logger.info("Finished loading Medline file: {}", fileName);
+
+                    Instant end = Instant.now();
+                    Duration duration = Duration.between(start, end);
+                    String formattedDuration = DurationFormatUtils.formatDurationHMS(duration.toMillis());
+                    logger.info("Total load time for Medline file {}: {}\n", fileName, formattedDuration);
+
                 } catch (IOException | ParserConfigurationException | SAXException e) {
                     logger.error(e.getMessage());
                     e.printStackTrace();
