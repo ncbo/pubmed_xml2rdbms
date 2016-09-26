@@ -13,6 +13,8 @@ public class MedlineCitationHandler extends DefaultHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(MedlineCitationHandler.class);
 
+    private boolean setPMID;
+
     private List<NewMedlineCitationEventListener> listeners = new ArrayList<>();
 
     private MedlineCitation citation;
@@ -21,9 +23,15 @@ public class MedlineCitationHandler extends DefaultHandler {
 
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-        if (qName.equals("MedlineCitation")) {
-            citation = new MedlineCitation();
+        switch (qName) {
+            case "MedlineCitation":
+                citation = new MedlineCitation();
+                break;
+            case "CommentsCorrectionsList":
+                setPMID = false;
+                break;
         }
+
         characterBuffer = new StringBuilder();
     }
 
@@ -33,7 +41,9 @@ public class MedlineCitationHandler extends DefaultHandler {
 
         switch (qName) {
             case "PMID":
-                citation.setPubMedId(characterValue);
+                if (setPMID) {
+                    citation.setPubMedId(characterValue);
+                }
                 break;
             case "ArticleTitle":
                 citation.setArticleTitle(characterValue);
@@ -46,6 +56,9 @@ public class MedlineCitationHandler extends DefaultHandler {
                 break;
             case "DescriptorName":
                 citation.getMeshHeadings().add(characterValue);
+                break;
+            case "CommentsCorrectionsList":
+                setPMID = true;
                 break;
             case "MedlineCitation":
                 fireNewMedlineCitationEvent();
