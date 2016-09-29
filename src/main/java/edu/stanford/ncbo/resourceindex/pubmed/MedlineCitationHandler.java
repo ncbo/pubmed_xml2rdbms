@@ -13,7 +13,7 @@ public class MedlineCitationHandler extends DefaultHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(MedlineCitationHandler.class);
 
-    private boolean setPMID;
+    private boolean setPMID = true;
 
     private List<NewMedlineCitationEventListener> listeners = new ArrayList<>();
 
