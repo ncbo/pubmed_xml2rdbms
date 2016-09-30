@@ -1,6 +1,7 @@
 package edu.stanford.ncbo.resourceindex.pubmed;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.comparator.NameFileComparator;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Collection;
 
 public class MedlineCitationETL {
@@ -45,15 +47,25 @@ public class MedlineCitationETL {
         handler.addNewMedlineCitationListener(translator);
 
         // Load all Medline XML files in data directory.
-        Boolean performValidation = Boolean.parseBoolean(defaultProps.getProperty("performValidation"));
         Collection<File> files = FileUtils.listFiles(file, new String[]{"xml.zip"}, false);
-        for (File f : files) {
+
+        /**
+         * Sort the distribution files in reverse order by name so that the newest Medline data is loaded
+         * into the database first.  Unfortunate hack to avoid making changes in the NCBO Resource Index project,
+         * which currently has no easy means of ordering data before beginning it's ElasticSearch population.
+         */
+        File[] fileArray = files.stream().map(File::getAbsoluteFile).toArray(File[]::new);
+        Arrays.sort(fileArray, NameFileComparator.NAME_INSENSITIVE_REVERSE);
+
+        Boolean performValidation = Boolean.parseBoolean(defaultProps.getProperty("performValidation"));
+
+        for (File f : fileArray) {
             String fileName = f.getName();
             logger.info("Load Medline file: {}", fileName);
 
             Instant start = Instant.now();
 
-            MedlineCitationExtractor mce = new MedlineCitationExtractor(f, performValidation.booleanValue());
+            MedlineCitationExtractor mce = new MedlineCitationExtractor(f, performValidation);
             InputStream inputStream = mce.extract();
 
             if (inputStream != null) {
