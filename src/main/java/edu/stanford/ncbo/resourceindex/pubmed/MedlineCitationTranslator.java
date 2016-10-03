@@ -7,7 +7,7 @@ import java.io.StringReader;
 import java.sql.*;
 import java.util.List;
 
-public class MedlineCitationTranslator implements NewMedlineCitationEventListener {
+public class MedlineCitationTranslator implements NewMedlineCitationEventListener, MedlineDocumentEndEventListener {
 
     private static final Logger logger = LoggerFactory.getLogger(MedlineCitationTranslator.class);
 
@@ -59,9 +59,20 @@ public class MedlineCitationTranslator implements NewMedlineCitationEventListene
             if (counter % batchSize == 0) {
                 int[] results = preparedStatement.executeBatch();
                 connection.commit();
-                logger.info("Committed a batch.  Number of rows: {}", results.length);
+                logger.info("Committed a batch. Affected rows: {}", results.length);
             }
 
+        } catch (SQLException e) {
+            logSQLException(e);
+        }
+    }
+
+    @Override
+    public void handleMedlineDocumentEndEvent(MedlineDocumentEndEvent event) {
+        try {
+            int[] results = preparedStatement.executeBatch();
+            connection.commit();
+            logger.info("Reached end of document. Flush remaining batches. Affected rows: {}", results.length);
         } catch (SQLException e) {
             logSQLException(e);
         }

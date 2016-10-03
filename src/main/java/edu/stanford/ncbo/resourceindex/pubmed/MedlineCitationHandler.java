@@ -15,7 +15,9 @@ public class MedlineCitationHandler extends DefaultHandler {
 
     private boolean setPMID = true;
 
-    private List<NewMedlineCitationEventListener> listeners = new ArrayList<>();
+    private List<NewMedlineCitationEventListener> newCitationListeners = new ArrayList<>();
+
+    private List<MedlineDocumentEndEventListener> documentEndListeners = new ArrayList<>();
 
     private MedlineCitation citation;
 
@@ -71,18 +73,38 @@ public class MedlineCitationHandler extends DefaultHandler {
         characterBuffer.append(ch, start, length);
     }
 
+    @Override
+    public void endDocument() throws SAXException {
+        fireMedlineDocumentEndEvent();
+    }
+
     public synchronized void addNewMedlineCitationListener(NewMedlineCitationEventListener listener) {
-        listeners.add(listener);
+        newCitationListeners.add(listener);
     }
 
     public synchronized void removeNewMedlineCitationListener(NewMedlineCitationEventListener listener) {
-        listeners.remove(listener);
+        newCitationListeners.remove(listener);
     }
 
     private synchronized void fireNewMedlineCitationEvent() {
         NewMedlineCitationEvent event = new NewMedlineCitationEvent(this, citation);
-        for (NewMedlineCitationEventListener listener : listeners) {
+        for (NewMedlineCitationEventListener listener : newCitationListeners) {
             listener.handleNewMedlineCitation(event);
+        }
+    }
+
+    public synchronized void addMedlineDocumentEndListener(MedlineDocumentEndEventListener listener) {
+        documentEndListeners.add(listener);
+    }
+
+    public synchronized void removeMedlineDocumentEndListener(MedlineDocumentEndEventListener listener) {
+        documentEndListeners.remove(listener);
+    }
+
+    private synchronized void fireMedlineDocumentEndEvent() {
+        MedlineDocumentEndEvent event = new MedlineDocumentEndEvent(this);
+        for (MedlineDocumentEndEventListener documentEndListener : documentEndListeners) {
+            documentEndListener.handleMedlineDocumentEndEvent(event);
         }
     }
 

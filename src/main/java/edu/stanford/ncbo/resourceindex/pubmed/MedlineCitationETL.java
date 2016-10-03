@@ -41,10 +41,8 @@ public class MedlineCitationETL {
 
         MedlineCitationHandler handler = new MedlineCitationHandler();
         MedlineCitationTranslator translator = new MedlineCitationTranslator();
-
-        // TODO: If any SQLExceptions are thrown by instantiating a translator, don't continue.
-
         handler.addNewMedlineCitationListener(translator);
+        handler.addMedlineDocumentEndListener(translator);
 
         // Load all Medline XML files in data directory.
         Collection<File> files = FileUtils.listFiles(file, new String[]{"xml.zip"}, false);
