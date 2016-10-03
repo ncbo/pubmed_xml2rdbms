@@ -13,8 +13,6 @@ public class MedlineCitationTranslator implements NewMedlineCitationEventListene
 
     private Connection connection;
 
-    private int batchSize = 1000;
-
     private int counter = 0;
 
     private MedlineCitationETLProperties props;
@@ -56,7 +54,7 @@ public class MedlineCitationTranslator implements NewMedlineCitationEventListene
             preparedStatement.addBatch();
             counter++;
 
-            if (counter % batchSize == 0) {
+            if (counter % 1000 == 0) {
                 int[] results = preparedStatement.executeBatch();
                 connection.commit();
                 logger.info("Committed a batch. Affected rows: {}", results.length);
