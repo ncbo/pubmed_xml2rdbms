@@ -98,8 +98,16 @@ public class MedlineCitationETL {
         MedlineCitationETL loader = new MedlineCitationETL();
 
         logger.info("Begin loading 2016 MEDLINE/PubMed baseline database distribution");
+
+        Instant start = Instant.now();
         loader.loadMedlineFiles();
+        Instant end = Instant.now();
+
         logger.info("Finished loading 2016 MEDLINE/PubMed baseline database distribution");
+
+        Duration duration = Duration.between(start, end);
+        String formattedDuration = DurationFormatUtils.formatDurationHMS(duration.toMillis());
+        logger.info("Total load time for 2016 MEDLINE/PubMed baseline database distribution: {}", formattedDuration);
     }
 
 }
