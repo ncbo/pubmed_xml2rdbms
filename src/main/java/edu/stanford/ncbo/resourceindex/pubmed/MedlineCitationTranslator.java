@@ -13,6 +13,10 @@ public class MedlineCitationTranslator implements NewMedlineCitationEventListene
 
     private Connection connection;
 
+    private int batchSize = 1000;
+
+    private int counter = 0;
+
     private MedlineCitationETLProperties props;
 
     private PreparedStatement preparedStatement;
@@ -50,8 +54,14 @@ public class MedlineCitationTranslator implements NewMedlineCitationEventListene
             preparedStatement.setString(5, meshHeadings);
 
             preparedStatement.addBatch();
-            preparedStatement.executeBatch();
-            connection.commit();
+            counter++;
+
+            if (counter % batchSize == 0) {
+                int[] results = preparedStatement.executeBatch();
+                connection.commit();
+                logger.info("Committed a batch.  Number of rows: {}", results.length);
+            }
+
         } catch (SQLException e) {
             logSQLException(e);
         }
@@ -61,9 +71,16 @@ public class MedlineCitationTranslator implements NewMedlineCitationEventListene
         String url = props.getProperty("jdbc.url");
         String user = props.getProperty("jdbc.username");
         String password = props.getProperty("jdbc.password");
-        String insertString =
-                String.format("INSERT INTO %s.%s (local_element_id, pm_title, pm_abstract, " +
-                        "pm_keywords, pm_meshheadings) VALUES (?,?,?,?,?)", databaseName, tableName);
+
+        /**
+         * Using "ignore" in SQL because NLM's XML files distribution contains a few instances of Medline
+         * citation objects with duplicate PubMed IDs (duplicates are differentiated by a VersionID attribute).
+         * Current DB schema has a uniqueness constraint on the local_element_id column that houses the PubMed ID.
+         * In this version of the code, we've chosen not to maintain multiple versions of Medline citations and/or
+         * to add logic that updates content.
+         */
+        String insertString = String.format("INSERT IGNORE INTO %s.%s (local_element_id, pm_title, pm_abstract, " +
+                "pm_keywords, pm_meshheadings) VALUES (?,?,?,?,?)", databaseName, tableName);
 
         try {
             connection = DriverManager.getConnection(url, user, password);
@@ -94,12 +111,13 @@ public class MedlineCitationTranslator implements NewMedlineCitationEventListene
         }
     }
 
-    private static void logSQLException(SQLException e) {
+    private static void logSQLException(
+            SQLException e) {
         if (e != null) {
             logger.error("SQLState: {}", ((SQLException)e).getSQLState());
             logger.error("Error Code: {}", ((SQLException)e).getErrorCode());
             logger.error("Message: {}", e.getMessage());
-            //e.printStackTrace();
+            e.printStackTrace();
         }
     }
 
