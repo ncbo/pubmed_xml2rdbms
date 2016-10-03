@@ -9,6 +9,14 @@
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
+  <name>pubmed_xml2rdbms</name>
+  <description>Loads citation records from the annual MEDLINE/PubMed XML format distribution into a MySQL database table.</description>
+  <url>https://github.com/ncbo/pubmed_xml2rdbms</url>
+  <organization>
+    <name>The National Center for Biomedical Ontology</name>
+    <url>http://www.bioontology.org</url>
+  </organization>
+
   <developers>
     <developer>
       <id>jvendetti</id>
@@ -18,6 +26,30 @@
       <organizationUrl>http://bmir.stanford.edu/</organizationUrl>
     </developer>
   </developers>
+
+  <mailingLists>
+    <mailingList>
+      <name>bioontology-support</name>
+      <subscribe>https://mailman.stanford.edu/mailman/listinfo/bioontology-support</subscribe>
+      <unsubscribe>https://mailman.stanford.edu/mailman/listinfo/bioontology-support</unsubscribe>
+      <post>bioontology-support@lists.stanford.edu</post>
+      <archive>http://ncbo-support.2288202.n4.nabble.com</archive>
+      <otherArchives>
+        <otherArchive>https://mailman.stanford.edu/pipermail/bioontology-support/</otherArchive>
+      </otherArchives>
+    </mailingList>
+  </mailingLists>
+
+  <scm>
+    <connection>scm:git:git://github.com/ncbo/pubmed_xml2rdbms.git</connection>
+    <developerConnection>scm:git:git@github.com:ncbo/pubmed_xml2rdbms.git</developerConnection>
+    <url>https://github.com/ncbo/pubmed_xml2rdbms</url>
+    <tag>HEAD</tag>
+  </scm>
+  <issueManagement>
+    <system>GitHub</system>
+    <url>https://github.com/ncbo/pubmed_xml2rdbms/issues</url>
+  </issueManagement>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -75,6 +107,30 @@
           <source>1.8</source>
           <target>1.8</target>
         </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.6</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>edu.stanford.ncbo.resourceindex.pubmed.MedlineCitationETL</mainClass>
+            </manifest>
+          </archive>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
 
     </plugins>
