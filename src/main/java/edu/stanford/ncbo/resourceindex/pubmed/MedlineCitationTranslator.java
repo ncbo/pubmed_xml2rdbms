@@ -45,11 +45,11 @@ public class MedlineCitationTranslator implements NewMedlineCitationEventListene
             preparedStatement.setString(2, citation.getArticleTitle());
             preparedStatement.setString(3, citation.getAbstractText());
 
-            List keywordList = citation.getKeywords();
+            List<String> keywordList = citation.getKeywords();
             String keywords = (keywordList.isEmpty()) ? "" : String.join(",", keywordList);
             preparedStatement.setString(4, keywords);
 
-            List meshHeadingsList = citation.getMeshHeadings();
+            List<String> meshHeadingsList = citation.getMeshHeadings();
             String meshHeadings = (meshHeadingsList.isEmpty()) ? "" : String.join(",", meshHeadingsList);
             preparedStatement.setString(5, meshHeadings);
 
