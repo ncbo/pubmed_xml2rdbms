@@ -88,6 +88,7 @@ public class MedlineCitationETL {
         }
 
         handler.removeNewMedlineCitationListener(translator);
+        handler.removeMedlineDocumentEndListener(translator);
 
         return true;
     }
