@@ -12,7 +12,7 @@ The National Library of Medicine (NLM) provides a [baseline set of MEDLINE/PubMe
 * Keywords
 * Medical Subject Headings (MeSH)
 
-After the desired subset of citation record data is processed, the resulting fully-populated MySQL table is utilized by the [NCBO Resource Index](https://github.com/ncbo/resource_index) project.
+After all citation records are processed, the resulting fully-populated MySQL table is utilized by the [NCBO Resource Index](https://github.com/ncbo/resource_index) project.
 
 ### Configuration
 
